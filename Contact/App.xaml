@@ -33,12 +33,26 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="3" CornerRadius="10" BorderBrush="{StaticResource MainBackgroungItem}">
+                        <Border 
+                            x:Name="border" 
+                            BorderThickness="3" 
+                            CornerRadius="10" 
+                            BorderBrush="{StaticResource MainBackgroungItem}"
+                            Background="White"
+                            MinHeight="35"
+                            MinWidth="80"
+                            Margin="1"
+                            >
                             <ContentPresenter HorizontalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="True">
+                    <Setter Property="Background" Value="{StaticResource MainForeground}"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <Style TargetType="ListBoxItem">
@@ -83,11 +97,18 @@
                                         <TextBlock Text="{Binding Phone}" Grid.Column="1"  Style="{StaticResource Textbox_info}"/>
                                     </Grid>
                                 </StackPanel>
-                                <Button Grid.Column="2" VerticalAlignment="Center"
-                                        DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=DataContext}"
-                                        Command="{Binding EditCommand}"
-                                        CommandParameter="{Binding ElementName=id, Path=Text}"
-                                        Content="Edit"/>
+                                <UniformGrid Columns="2" Grid.Column="2">
+                                    <Button VerticalAlignment="Center"
+                                            DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=DataContext}"
+                                            Command="{Binding EditCommand}"
+                                            CommandParameter="{Binding ElementName=id, Path=Text}"
+                                            Content="Редактировать"/>
+                                    <Button Grid.Column="2" VerticalAlignment="Center"
+                                            DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=DataContext}"
+                                            Command="{Binding DeleteCommand}"
+                                            CommandParameter="{Binding ElementName=id, Path=Text}"
+                                            Content="Удалить"/>
+                                </UniformGrid>
                             </Grid>
                         </Border>
                     </ControlTemplate>

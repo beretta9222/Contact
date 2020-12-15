@@ -25,6 +25,12 @@ namespace Contact.ViewModel
             validProperties.Add("Phone", false);
         }
 
+        private void UpdateContacts()
+        {
+            Model.XML.SaveContact(ListContacts);
+            ListContacts = Model.XML.GetContacts();
+        }
+
         /// <summary>
         /// For list contacts
         /// </summary>
@@ -169,6 +175,35 @@ namespace Contact.ViewModel
         }
         private RelayCommand<object> editCommand;
 
+
+        /// <summary>
+        /// Click edit contact
+        /// </summary>
+        public RelayCommand<object> DeleteCommand
+        {
+            get
+            {
+                return deleteCommand ?? (deleteCommand = new RelayCommand<object>((x) =>
+                {
+                    try
+                    {
+                        if (MessageBox.Show("Вы действительно хотите удалить контакт?", "Предуприждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            int id = int.Parse(x?.ToString());
+                            ListContacts.Remove(ListContacts.FirstOrDefault(i => i.ID == id));
+                            UpdateContacts();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine(ex.Message);
+                    }
+                }));
+            }
+        }
+        private RelayCommand<object> deleteCommand;
+
+
         /// <summary>
         /// Textbox FIO edit view 
         /// </summary>
@@ -232,9 +267,8 @@ namespace Contact.ViewModel
                             item.Phone = Phone;
                         }
 
-                        Model.XML.SaveContact(ListContacts);
-                        ListContacts = Model.XML.GetContacts();
-                       
+                        UpdateContacts();
+
                         EditContactVisibility = Visibility.Collapsed;
                     }
                     catch (Exception ex)

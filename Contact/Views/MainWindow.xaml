@@ -5,23 +5,42 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Contact"
         xmlns:valid ="clr-namespace:Contact.Helper"
+      
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow">
+        Title="MainWindow" MinHeight="400" MinWidth="800" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction Command="{Binding ClosingView}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Resources>
+        <valid:BoolsToBoolConverter x:Key="boolConverter"/>
         <ControlTemplate x:Key="validationFailed">
             <StackPanel Orientation="Horizontal">
-                <Border BorderBrush="Violet" BorderThickness="2">
+                <Border BorderBrush="Red" BorderThickness="2">
                     <AdornedElementPlaceholder />
                 </Border>
-                <TextBlock Foreground="Red" FontSize="26" FontWeight="Bold">!</TextBlock>
+                <TextBlock Foreground="Red" FontSize="22" FontWeight="Bold">!</TextBlock>
             </StackPanel>
         </ControlTemplate>
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="Foreground" Value="{StaticResource MainForeground}"/>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip"
+                Value="{Binding RelativeSource={RelativeSource Self},
+                    Path=(Validation.Errors)[0].ErrorContent}" />
+                    <Setter Property="Foreground" Value="Red" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="{StaticResource MainForeground_Lable}"/>
+        </Style>
+        
     </Window.Resources>
     <Grid Background="{StaticResource MainBackground}">
         <Grid.RowDefinitions>
@@ -32,7 +51,7 @@
             
         </ListBox>
         <Button Grid.Row="1" Content="Добавить новый контакт" Command="{Binding CreateContact}"/>
-        <Grid Visibility="{Binding EditContactVisibility}" Grid.RowSpan="2" Background="Aqua">
+        <Grid Visibility="{Binding EditContactVisibility}" Grid.RowSpan="2" Background="#DDFFFFFF">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="*" MinWidth="300"/>
@@ -45,10 +64,35 @@
             </Grid.RowDefinitions>
             <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="1">
                 <TextBlock Text="Введите имя"/>
-                <TextBox Text="{Binding Name, ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}" />
+                <!--<TextBox Text="{Binding Name, ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}">-->
+                <TextBox x:Name="name"  Validation.ErrorTemplate="{StaticResource validationFailed}">
+                    <TextBox.Text>
+                        <Binding Path="Name" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <valid:ValidationName/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
                 <TextBlock Text="Введите телефон"/>
-                <TextBox Text="{Binding Phone, ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}" />
-                <Button Grid.Row="1" Content="Сохранить" Command="{Binding SaveCommand}"/>
+                <TextBox x:Name="phone" Validation.ErrorTemplate="{StaticResource validationFailed}">
+                    <TextBox.Text>
+                        <Binding Path="Phone" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <valid:ValidationPhone/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <!--<TextBox Text="{Binding Phone, ValidatesOnNotifyDataErrors=True,UpdateSourceTrigger=PropertyChanged}" />-->
+                <Button Grid.Row="1" Content="Сохранить" Command="{Binding SaveCommand}" Margin="20">
+                    <Button.IsEnabled>
+                        <MultiBinding Converter="{StaticResource boolConverter}">
+                            <Binding ElementName="name" Path="(Validation.HasError)"/>
+                            <Binding ElementName="phone" Path="(Validation.HasError)"/>
+                        </MultiBinding>
+                    </Button.IsEnabled>
+                </Button>
             </StackPanel>
         </Grid>
     </Grid>
