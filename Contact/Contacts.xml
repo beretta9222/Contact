@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<contacts>
+  <contact>
+    <id>1</id>
+    <fio>FIO</fio>
+    <phone>+70000000000</phone>
+  </contact>
+</contacts>
